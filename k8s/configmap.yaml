@@ -1,0 +1,33 @@
+# Non-sensitive runtime configuration for the Agentic API (FINDING-001/-010).
+#
+# The keys mirror `.env.example` exactly (single source of truth for the
+# variable schema) and are consumed by pydantic-settings as plain environment
+# variables via `envFrom.configMapRef` in the Deployment.
+#
+# Secrets (API keys) do NOT belong here: they live in the `agentic-api-secrets`
+# Secret object, which is created at deploy time and never committed to the
+# repository (see README.md -> "Running on minikube").
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentic-api-config
+  labels:
+    app.kubernetes.io/name: agentic-api
+    app.kubernetes.io/component: api
+data:
+  # --- FASTAPI (env prefix: FASTAPI_) ---
+  FASTAPI_DOCS: "True" # set "False" in production (disables /docs)
+  FASTAPI_DOCS_URL: "docs"
+  FASTAPI_REDOC: "True" # set "False" in production (disables /redoc)
+  FASTAPI_REDOC_URL: "redoc"
+  FASTAPI_HOST: "0.0.0.0" # Pods must bind all interfaces to receive probe/service traffic
+  FASTAPI_PORT: "8000"
+  FASTAPI_CORS_ORIGINS: '["*"]' # tighten to explicit scheme://host[:port] origins in production
+  # --- AGENT (env prefix: AGENT_) ---
+  AGENT_MODEL: "qwen3.7-flash"
+  AGENT_TOKEN_LIMIT: "1000000"
+  # --- FIBERY (env prefix: FIBERY_) ---
+  FIBERY_URL: "https://your-tenant.fibery.io/api/graphql/space/Email"
+  # --- LOGGING (env prefix: LOG_) ---
+  LOG_LEVEL: "INFO"
+  LOG_JSON_FORMAT: "True"

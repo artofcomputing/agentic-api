@@ -1,0 +1,30 @@
+query GetEmails {
+    findEmails(
+        limit: 100
+    ) {
+        publicId
+        name
+        date
+        email
+        message {
+            md
+        }
+        from {
+            name
+            email
+        }
+        files {
+            name
+            url
+        }
+        rubric
+    }
+}
+
+mutation UpdateEmailRubric($publicId: String!, $rubric: Int!) {
+    emails(publicId: { is: $publicId }) {
+        update(rubric: $rubric) {
+            message
+        }
+    }
+}

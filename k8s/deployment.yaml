@@ -1,0 +1,102 @@
+# Agentic API Deployment (FINDING-001/-016).
+#
+# Health management is delegated entirely to Kubernetes probes against the
+# unauthenticated /livez and /readyz endpoints. The Docker image intentionally
+# has NO HEALTHCHECK instruction: Kubernetes ignores it.
+#
+# The `agentic-api-secrets` Secret referenced below must exist before the Pods
+# start; create it at deploy time (see README.md), never commit real values.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentic-api
+  labels:
+    app.kubernetes.io/name: agentic-api
+    app.kubernetes.io/component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: agentic-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: agentic-api
+        app.kubernetes.io/component: api
+    spec:
+      # The app never talks to the Kubernetes API: don't mount a token.
+      automountServiceAccountToken: false
+      securityContext:
+        # Numeric IDs are pinned in the image (Dockerfile) AND here, so the
+        # kubelet can verify runAsNonRoot against the named image user.
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: agentic-api
+          image: agentic-api:latest
+          # Image is built/loaded directly into the minikube runtime.
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          # pydantic-settings reads these exactly like a local .env file:
+          # non-sensitive values from the ConfigMap, credentials from the Secret.
+          envFrom:
+            - configMapRef:
+                name: agentic-api-config
+            - secretRef:
+                name: agentic-api-secrets
+          # Startup probe: gates liveness/readiness until first success, giving
+          # slow starts up to 2s x 30 = 60s before the kubelet intervenes.
+          startupProbe:
+            httpGet:
+              path: /livez
+              port: http
+            periodSeconds: 2
+            timeoutSeconds: 3
+            failureThreshold: 30
+          # Liveness probe: restarts the container when the event loop hangs.
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # Readiness probe: removes the Pod from Service endpoints until the
+          # lifespan fail-fast checks have completed.
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

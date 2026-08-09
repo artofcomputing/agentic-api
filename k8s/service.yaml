@@ -1,0 +1,20 @@
+# Internal-only entry point for the Agentic API.
+#
+# ClusterIP keeps the Service private to the cluster; expose it deliberately
+# (Ingress, LoadBalancer) per environment instead of widening this default.
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentic-api
+  labels:
+    app.kubernetes.io/name: agentic-api
+    app.kubernetes.io/component: api
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: agentic-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
