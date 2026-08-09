@@ -53,7 +53,7 @@ uv run python -m agentic.main
    deploy time; never stored in the repository:
    ```bash
    kubectl create secret generic agentic-api-secrets \
-     --from-literal=FASTAPI_API_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')" \
+     --from-literal=FASTAPI_API_KEY="<your FastAPI key>" \
      --from-literal=AGENT_API_KEY="<your LLM provider API key>" \
      --from-literal=FIBERY_API_KEY="<your Fibery API key>"
    ```
@@ -86,8 +86,7 @@ uv run python -m agentic.main
 ### Health management
 
 Container health is managed exclusively by Kubernetes probes configured in
-`k8s/deployment.yaml` (the Docker image deliberately has no `HEALTHCHECK` —
-Kubernetes ignores it):
+`k8s/deployment.yaml`:
 
 | Probe | Endpoint | Purpose |
 | :--- | :--- | :--- |
@@ -96,7 +95,7 @@ Kubernetes ignores it):
 | Readiness | `GET /readyz` | Removes the Pod from the Service until startup checks pass |
 
 Both endpoints are unauthenticated and registered outside the `/api/v1` auth
-boundary, so probes never need API credentials.
+boundary.
 
 ### Cleanup
 
