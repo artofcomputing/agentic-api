@@ -4,11 +4,12 @@ from pydantic import BaseModel, Field
 
 
 class AgentRunRequest(BaseModel):
-    """Schema for requesting an agent execution with optional instruction override."""
+    """Schema for requesting an agent execution with a user instruction."""
 
-    user_instruction: str | None = Field(
-        None,
-        description="Optional markdown text or instruction query",
+    user_instruction: str = Field(
+        ...,
+        min_length=1,
+        description="Markdown text or instruction query",
     )
 
 

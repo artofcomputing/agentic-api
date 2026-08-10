@@ -26,6 +26,7 @@ data:
   # --- AGENT (env prefix: AGENT_) ---
   AGENT_MODEL: "qwen3.7-flash"
   AGENT_TOKEN_LIMIT: "1000000"
+  AGENT_INSTRUCTION_LIMIT: "200000"
   # --- FIBERY (env prefix: FIBERY_) ---
   FIBERY_URL: "https://your-tenant.fibery.io/api/graphql/space/Email"
   # --- LOGGING (env prefix: LOG_) ---
