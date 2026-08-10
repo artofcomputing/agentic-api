@@ -8,7 +8,7 @@ from agentic.ai.agents.conversational.agent import (
     agent as conversational_agent,
 )
 from agentic.ai.agents.email.agent import agent as email_agent
-from agentic.ai.prompts.loader import load_prompt
+from agentic.ai.prompts.loader import get_prompt
 from agentic.ai.tools.fibery import FiberyDeps
 from agentic.api.deps import (
     get_agent_deps,
@@ -43,7 +43,7 @@ async def run_email_agent(
         instruction = payload.user_instruction
     else:
         try:
-            instruction = load_prompt("email", "DEFAULT_INSTRUCTION")
+            instruction = get_prompt("email", "DEFAULT_INSTRUCTION")
             logger.info("Using email default instruction from DEFAULT_INSTRUCTION.md")
         except Exception as e:
             logger.critical("Failed to load email default instruction: %s", e)
@@ -98,7 +98,7 @@ async def run_conversational_agent(
         instruction = payload.user_instruction
     else:
         try:
-            instruction = load_prompt("conversational", "DEFAULT_INSTRUCTION")
+            instruction = get_prompt("conversational", "DEFAULT_INSTRUCTION")
             logger.info(
                 "Using conversational default instruction from DEFAULT_INSTRUCTION.md"
             )

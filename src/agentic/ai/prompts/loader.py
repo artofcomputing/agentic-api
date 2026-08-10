@@ -1,14 +1,15 @@
+from functools import lru_cache
 from pathlib import Path
 
 # Base directory relative to this file's position
 PROMPTS_DIR = Path(__file__).parent.resolve()
 
-
-def load_prompt(agent: str, name: str) -> str:
-    """Loads and returns prompt text dynamically for a given agent and prompt name.
+@lru_cache(maxsize=32)
+def get_prompt(agent: str, name: str) -> str:
+    """Fetches prompt text for a given agent and prompt name.
 
     Args:
-        agent: Subdirectory name under prompts (e.g., 'email', 'conversational').
+        agent: Subdirectory name under prompts (e.g., 'conversational').
         name: Name of the prompt file (e.g., 'SYSTEM_PROMPT' or 'SYSTEM_PROMPT.md').
 
     Returns:

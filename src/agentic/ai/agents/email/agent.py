@@ -2,7 +2,7 @@ import logging
 
 from pydantic_ai import Agent, RunContext
 
-from agentic.ai.prompts.loader import load_prompt
+from agentic.ai.prompts.loader import get_prompt
 from agentic.ai.tools import fibery_toolset
 from agentic.ai.tools.fibery import FiberyDeps
 
@@ -17,7 +17,7 @@ agent = Agent(deps_type=FiberyDeps, retries=3, toolsets=[fibery_toolset])
 def load_instructions(ctx: RunContext[FiberyDeps]) -> str:
     """Dynamically loads and injects instructions from SYSTEM_PROMPT.md."""
     try:
-        content = load_prompt("email", "SYSTEM_PROMPT")
+        content = get_prompt("email", "SYSTEM_PROMPT")
         logger.info("Successfully loaded SYSTEM_PROMPT")
         return content
     except Exception as e:

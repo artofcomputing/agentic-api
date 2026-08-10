@@ -2,7 +2,7 @@ import logging
 
 from pydantic_ai import Agent
 
-from agentic.ai.prompts.loader import load_prompt
+from agentic.ai.prompts.loader import get_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ agent = Agent(retries=3)
 def load_conversational_instructions() -> str:
     """Dynamically loads and injects instructions from SYSTEM_PROMPT.md"""
     try:
-        content = load_prompt("conversational", "SYSTEM_PROMPT")
+        content = get_prompt("conversational", "SYSTEM_PROMPT")
         logger.info("Successfully loaded SYSTEM_PROMPT")
         return content
     except Exception as e:
