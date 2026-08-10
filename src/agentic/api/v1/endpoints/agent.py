@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -32,7 +33,8 @@ async def run_conversational_agent(
     model: Model = Depends(get_conversational_agent_model),
 ) -> AgentRunResponse:
     """Conversational Agent"""
-    # Enforce the application-level instruction length limit
+    # Enforce the configurable instruction length limit. The hard ceiling
+    # (MAX_INSTRUCTION_CHARS) is already enforced during schema validation.
     if len(payload.user_instruction) > agent_settings.instruction_limit:
         logger.warning("User instruction exceeds the configured instruction limit")
         raise HTTPException(
@@ -43,23 +45,35 @@ async def run_conversational_agent(
             ),
         )
 
-    # Run Agent
+    # Run Agent under a hard end-to-end deadline.
     try:
         logger.info("Executing conversational agent instruction")
-        result = await conversational_agent.run(
-            payload.user_instruction,
-            model=model,
-            usage_limits=UsageLimits(total_tokens_limit=agent_settings.token_limit),
-            toolsets=[time_toolset],
-        )
+        async with asyncio.timeout(agent_settings.request_timeout):
+            result = await conversational_agent.run(
+                payload.user_instruction,
+                model=model,
+                usage_limits=UsageLimits(total_tokens_limit=agent_settings.token_limit),
+                toolsets=[time_toolset],
+                retries=agent_settings.retries,
+            )
         logger.info("Conversational agent instruction completed successfully")
 
         return AgentRunResponse(output=result.output, usage=result.usage)
 
-    except UsageLimitExceeded:
-        logger.exception("Usage limit exceeded")
+    except TimeoutError:
+        logger.warning(
+            "Agent execution timed out after %s seconds",
+            agent_settings.request_timeout,
+        )
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail="Agent execution timed out",
+        )
+
+    except UsageLimitExceeded:
+        logger.warning("Agent usage limit exceeded")
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Usage limit exceeded",
         )
 

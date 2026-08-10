@@ -7,8 +7,9 @@ from agentic.ai.prompts.loader import get_prompt
 logger = logging.getLogger(__name__)
 
 # Initialize the Pydantic AI Agent declaratively with tools and dependency type.
-# The model is dynamically passed during execution (agent.run) to support runtime configuration.
-agent = Agent(retries=3)
+# Kept stateless: the model and the retry budget are supplied per-run from
+# configuration (agent.run) to support runtime configuration.
+agent = Agent()
 
 
 @agent.system_prompt

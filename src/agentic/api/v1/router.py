@@ -7,15 +7,31 @@ from agentic.api.deps import get_fastapi_settings
 from agentic.api.v1.endpoints import agent
 from agentic.config.fastapi import FastAPISettings
 
-frontend_api_key = APIKeyHeader(name="x-api-key", description="API Key")
+# auto_error=False: a missing header must yield None (handled below with a
+# 401) instead of FastAPI's default 403.
+frontend_api_key = APIKeyHeader(
+    name="x-api-key", description="API Key", auto_error=False
+)
 
 
 async def verify_api_key(
-    key: str = Depends(frontend_api_key),
+    key: str | None = Depends(frontend_api_key),
     s: FastAPISettings = Depends(get_fastapi_settings),
 ) -> None:
-    if not hmac.compare_digest(key, s.api_key.get_secret_value()):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    """Constant-time API-key verification, returns 401 in case of comparison failure."""
+    unauthorized = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid or missing API key",
+        headers={"WWW-Authenticate": "ApiKey"},
+    )
+    if key is None:
+        raise unauthorized
+    # Compare bytes (header values arrive latin-1 decoded) so non-ASCII input
+    # can never raise inside hmac.compare_digest.
+    provided = key.encode("latin-1")
+    expected = s.api_key.get_secret_value().encode("utf-8")
+    if not hmac.compare_digest(provided, expected):
+        raise unauthorized
 
 
 api_router = APIRouter(dependencies=[Depends(verify_api_key)])

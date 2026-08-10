@@ -2,6 +2,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from agentic.config.agent import MAX_INSTRUCTION_CHARS
+
 
 class AgentRunRequest(BaseModel):
     """Schema for requesting an agent execution with a user instruction."""
@@ -9,7 +11,8 @@ class AgentRunRequest(BaseModel):
     user_instruction: str = Field(
         ...,
         min_length=1,
-        description="Markdown text or instruction query",
+        max_length=MAX_INSTRUCTION_CHARS,
+        description="Markdown text or instruction query (characters, not tokens)",
     )
 
 

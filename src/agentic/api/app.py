@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from agentic.ai.prompts.loader import get_prompt
+from agentic.api.deps import build_conversational_model
 from agentic.api.probes import router as probes_router
 from agentic.api.v1.router import api_router
 from agentic.config.agent import AgentSettings
@@ -19,23 +21,28 @@ async def lifespan(app: FastAPI):
     app.state.ready = False
     logger.info("Performing fail-fast startup configuration checks...")
     try:
-        # Verify every settings object was attached to app.state by
-        # create_app(); a missing attribute raises immediately (fail fast).
-        _ = (
-            app.state.fastapi_settings,
-            app.state.agent_settings,
-        )
-        logger.info("Fail-fast configuration checks passed successfully.")
+        # The prompt file must be readable before serving traffic
+        # (also warms the lru_cache used on the request path).
+        get_prompt("conversational", "SYSTEM_PROMPT")
+        # The LLM model must be constructible from configuration
+        # Built once here; requests reuse the shared instance
+        # via app.state (no per-request provider/client construction).
+        model, http_client = build_conversational_model(app.state.agent_settings)
     except Exception as e:
-        logger.critical(
-            "Fail-Fast Startup Error: Configuration validation failed: %s",
-            e,
-        )
+        logger.critical("Fail-Fast Startup Error: %s", e)
         raise SystemExit(1) from e
-    # Startup checks passed: mark the app ready so the Kubernetes readiness
-    # probe (/readyz) starts succeeding.
+
+    # Injects the model in the server state and mark the app ready
+    # so the Kubernetes readiness probe (/readyz) starts succeeding.
+    app.state.agent_model = model
     app.state.ready = True
-    yield
+    logger.info("Fail-fast configuration checks passed successfully.")
+    try:
+        yield
+    # Teardown
+    finally:
+        app.state.ready = False
+        await http_client.aclose()
 
 
 def create_app(

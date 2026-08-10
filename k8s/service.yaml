@@ -2,6 +2,10 @@
 #
 # ClusterIP keeps the Service private to the cluster; expose it deliberately
 # (Ingress, LoadBalancer) per environment instead of widening this default.
+#
+# When exposing via Ingress, cap request bodies at the edge (uvicorn does not
+# limit body size), e.g.:
+#   nginx.ingress.kubernetes.io/proxy-body-size: "1m"
 apiVersion: v1
 kind: Service
 metadata:
