@@ -1,6 +1,7 @@
 from typing import Any
 
 from pydantic import BaseModel, Field
+from pydantic_ai import RunUsage
 
 from agentic.config.agent import MAX_INSTRUCTION_CHARS
 
@@ -24,4 +25,4 @@ class AgentRunResponse(BaseModel):
     )
     # The usage field is extremely dynamic due to different provider's definitions of usage, therefore it's best
     # to keep it simple.
-    usage: Any = Field(..., description="The agent API usage results")
+    usage: RunUsage = Field(..., description="The agent API usage results")

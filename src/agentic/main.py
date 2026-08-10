@@ -9,7 +9,7 @@ from agentic.config.logger import LoggerSettings
 from agentic.logger import setup_logging
 
 
-def start_web_server():
+def start_web_server() -> None:
     """Starts the FastAPI Web Server using uvicorn."""
     log_settings = LoggerSettings()
     setup_logging(log_level=log_settings.level, json_format=log_settings.json_format)
