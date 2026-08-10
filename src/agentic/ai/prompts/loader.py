@@ -10,7 +10,7 @@ def get_prompt(agent: str, name: str) -> str:
 
     Args:
         agent: Subdirectory name under prompts (e.g., 'conversational').
-        name: Name of the prompt file (e.g., 'SYSTEM_PROMPT' or 'SYSTEM_PROMPT.md').
+        name: Name of the prompt file (e.g., 'SYSTEM_PROMPT').
 
     Returns:
         The stripped string content of the prompt file.

@@ -14,7 +14,7 @@ class AgentRunRequest(BaseModel):
 
 
 class AgentRunResponse(BaseModel):
-    """Schema representing the successful execution result of the email ai."""
+    """Schema representing the successful execution result of the Agent."""
 
     output: Any = Field(
         ..., description="The direct output/result of the agent execution"

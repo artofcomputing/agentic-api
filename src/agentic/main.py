@@ -5,7 +5,6 @@ import uvicorn
 from agentic.api.app import create_app
 from agentic.config.agent import AgentSettings
 from agentic.config.fastapi import FastAPISettings
-from agentic.config.fibery import FiberySettings
 from agentic.config.logger import LoggerSettings
 from agentic.logger import setup_logging
 
@@ -22,9 +21,6 @@ def start_web_server():
     # Agent Settings Initialization
     agent_settings: AgentSettings = AgentSettings()  # type: ignore[call-arg]
 
-    # Fibery Settings Initialization
-    fibery_settings: FiberySettings = FiberySettings()  # type: ignore[call-arg]
-
     logger.info(
         "Starting FastAPI Web Server on %s:%s...",
         fastapi_settings.host,
@@ -33,7 +29,6 @@ def start_web_server():
     app = create_app(
         fastapi_settings=fastapi_settings,
         agent_settings=agent_settings,
-        fibery_settings=fibery_settings,
     )
     uvicorn.run(
         app,

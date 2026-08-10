@@ -18,10 +18,10 @@ A modular, cloud-native API for AI Agents powered by FastAPI, Pydantic, and Pyda
 All configuration is read from environment variables; `.env.example` is the
 authoritative template for the variable schema.
 
-| Scope | Variables | Kubernetes source |
-| :--- | :--- | :--- |
-| Non-sensitive settings | `FASTAPI_DOCS`, `FASTAPI_HOST`, `AGENT_MODEL`, `AGENT_TOKEN_LIMIT`, `FIBERY_URL`, `LOG_*`, ... | `ConfigMap/agentic-api-config` (`k8s/configmap.yaml`) |
-| Secrets | `FASTAPI_API_KEY`, `AGENT_API_KEY`, `FIBERY_API_KEY` | `Secret/agentic-api-secrets` (created at deploy time, never committed) |
+| Scope                  | Variables                                                                        | Kubernetes source                                                      |
+|:-----------------------|:---------------------------------------------------------------------------------|:-----------------------------------------------------------------------|
+| Non-sensitive settings | `FASTAPI_DOCS`, `FASTAPI_HOST`, `AGENT_MODEL`, `AGENT_TOKEN_LIMIT`, `LOG_*`, ... | `ConfigMap/agentic-api-config` (`k8s/configmap.yaml`)                  |
+| Secrets                | `FASTAPI_API_KEY`,                                                               | `Secret/agentic-api-secrets` (created at deploy time, never committed) |
 
 For **local development only**, copy `.env.example` to `.env` and fill in the
 values. Never commit `.env` or real credentials to version control.
@@ -54,11 +54,10 @@ uv run python -m agentic.main
    ```bash
    kubectl create secret generic agentic-api-secrets \
      --from-literal=FASTAPI_API_KEY="<your FastAPI key>" \
-     --from-literal=AGENT_API_KEY="<your LLM provider API key>" \
-     --from-literal=FIBERY_API_KEY="<your Fibery API key>"
+     --from-literal=AGENT_API_KEY="<your LLM provider API key>"
    ```
 
-4. **Review `k8s/configmap.yaml`** (at minimum `AGENT_MODEL`, `FIBERY_URL`, and
+4. **Review `k8s/configmap.yaml`** (at minimum `AGENT_MODEL`, and
    `FASTAPI_CORS_ORIGINS`), then deploy the ConfigMap, Deployment, and Service:
    ```bash
    kubectl apply -f k8s/

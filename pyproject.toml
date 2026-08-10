@@ -28,15 +28,6 @@ dev = [
     "pytest-asyncio>=1.0",
 ]
 
-codegen = [
-    "ariadne-codegen>=0.18"
-]
-
-[tool.uv]
-conflicts = [
-    [{"group" = "dev"}, {"group" = "codegen"}]
-]
-
 [tool.ruff.lint]
 ignore = ["B008"]
 
@@ -46,23 +37,3 @@ asyncio_mode = "auto"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agentic"]
-
-[tool.ariadne-codegen]
-# [REMOTE] Endpoint & Authentication Configuration
-# remote_schema_url = "$FIBERY_GRAPHQL_URL"
-# remote_schema_headers = { "Authorization" = "Token $FIBERY_GRAPHQL_AUTH_TOKEN" }
-
-# [REMOTE] Optional SSL and timeout configurations
-# remote_schema_verify_ssl = true
-# remote_schema_timeout = 10
-
-# [LOCAL] Output location when downloading the schema
-target_file_path = "src/agentic/ai/tools/fibery/graphql_client/schema.graphql"
-
-# [LOCAL] Client Query Generation
-queries_path = "src/agentic/ai/tools/fibery/graphql_client/queries.graphql"
-target_package_name = "graphql_client"
-target_package_path = "src/agentic/ai/tools/fibery"
-
-# [LOCAL] Client Schema Generation
-schema_path = "src/agentic/ai/tools/fibery/graphql_client/schema.graphql"

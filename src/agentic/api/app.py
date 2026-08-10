@@ -8,7 +8,6 @@ from agentic.api.probes import router as probes_router
 from agentic.api.v1.router import api_router
 from agentic.config.agent import AgentSettings
 from agentic.config.fastapi import FastAPISettings
-from agentic.config.fibery import FiberySettings
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +24,6 @@ async def lifespan(app: FastAPI):
         _ = (
             app.state.fastapi_settings,
             app.state.agent_settings,
-            app.state.fibery_settings,
         )
         logger.info("Fail-fast configuration checks passed successfully.")
     except Exception as e:
@@ -43,7 +41,6 @@ async def lifespan(app: FastAPI):
 def create_app(
     fastapi_settings: FastAPISettings,
     agent_settings: AgentSettings,
-    fibery_settings: FiberySettings,
 ) -> FastAPI:
     """Application factory for the FastAPI AI Agent server."""
 
@@ -66,8 +63,6 @@ def create_app(
     app.state.fastapi_settings = fastapi_settings
     # Store Agent config state
     app.state.agent_settings = agent_settings
-    # Store Fibery config state
-    app.state.fibery_settings = fibery_settings
 
     # Configure CORS: If '*' is present in allowed origins then
     # allow_credentials must be False to satisfy standard browser security
