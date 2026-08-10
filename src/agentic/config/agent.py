@@ -12,11 +12,11 @@ class AgentSettings(BaseSettings):
     token_limit: int = Field(
         gt=0,
         le=2_000_000,
-        description="The maximum amount of tokens to use for a session"
+        description="The maximum amount of tokens to use for a session",
     )
 
     instruction_limit: int = Field(
         gt=0,
         le=200_000,
-        description="The maximum amount of tokens that the user can provide per instruction."
+        description="The maximum amount of tokens that the user can provide per instruction.",
     )

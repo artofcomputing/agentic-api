@@ -4,6 +4,7 @@ from pathlib import Path
 # Base directory relative to this file's position
 PROMPTS_DIR = Path(__file__).parent.resolve()
 
+
 @lru_cache(maxsize=32)
 def get_prompt(agent: str, name: str) -> str:
     """Fetches prompt text for a given agent and prompt name.

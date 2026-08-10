@@ -16,9 +16,11 @@ def get_fastapi_settings(request: Request) -> FastAPISettings:
     """Dependency to retrieve the FastAPI state settings."""
     return request.app.state.fastapi_settings
 
+
 def get_agent_settings(request: Request) -> AgentSettings:
     """Dependency to retrieve the Agent state settings."""
     return request.app.state.agent_settings
+
 
 def get_conversational_agent_model(
     agent_config: AgentSettings = FastAPIDep(get_agent_settings),
