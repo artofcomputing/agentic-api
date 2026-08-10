@@ -37,7 +37,7 @@ async def get_emails(ctx: RunContext[FiberyDeps]) -> list[dict[str, Any]]:
         logger.info("No emails found.")
         return []
     except Exception as e:
-        logger.error("Failed to fetch emails: %s", e, exc_info=True)
+        logger.exception("Failed to fetch emails")
         # Raise or return error representation so LLM understands what went wrong
         raise RuntimeError(f"Failed to fetch emails: {e!s}")
 
@@ -52,9 +52,8 @@ async def update_emails(
     and resource exhaustion.
 
     Args:
-        updates: A list of email updates containing the publicId and the mapped rubric score.
-        :param updates:
-        :param ctx:
+          ctx: Run context providing the Fibery dependency container.
+          updates: Email updates containing the publicId and mapped rubric score.
     """
     if not updates:
         logger.info("No email updates provided.")
@@ -80,7 +79,7 @@ async def update_emails(
             # Gather tasks and return exceptions gracefully to prevent entire process crash
             results = await asyncio.gather(*tasks, return_exceptions=True)
     except Exception as e:
-        logger.error("Failed to execute updates: %s", e, exc_info=True)
+        logger.exception("Failed to execute updates")
         return f"Failed to execute updates: {e!s}"
 
     success_count = 0

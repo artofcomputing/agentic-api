@@ -9,14 +9,12 @@ from agentic.config.fibery import FiberySettings
 from agentic.config.logger import LoggerSettings
 from agentic.logger import setup_logging
 
-log_settings = LoggerSettings()
-
-# Configure initial logging using our custom structured JSON formatter
-setup_logging(log_level=log_settings.level, json_format=log_settings.json_format)
-logger = logging.getLogger("main")
-
 
 def start_web_server():
+    """Starts the FastAPI Web Server using uvicorn."""
+    log_settings = LoggerSettings()
+    setup_logging(log_level=log_settings.level, json_format=log_settings.json_format)
+    logger = logging.getLogger("main")
 
     # FastAPI Settings Initialization
     fastapi_settings: FastAPISettings = FastAPISettings()  # type: ignore[call-arg]
@@ -27,7 +25,6 @@ def start_web_server():
     # Fibery Settings Initialization
     fibery_settings: FiberySettings = FiberySettings()  # type: ignore[call-arg]
 
-    """Starts the FastAPI Web Server using uvicorn."""
     logger.info(
         "Starting FastAPI Web Server on %s:%s...",
         fastapi_settings.host,
