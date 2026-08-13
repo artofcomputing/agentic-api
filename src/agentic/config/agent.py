@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -14,6 +16,14 @@ class AgentSettings(BaseSettings):
     )
 
     api_key: SecretStr = Field(description="The API key required for LLM model")
+    provider : Literal["openai_compatible", "alibaba"] = Field(
+        default="alibaba",
+        description="LLM provider backend to be used by the conversational agent.",
+    )
+    provider_base_url: str | None = Field(
+        default=None,
+        description="Override endpoint required for OpenAI compatible providers.",
+    )
     model: str = Field(description="The model to be used")
     token_limit: int = Field(
         gt=0,

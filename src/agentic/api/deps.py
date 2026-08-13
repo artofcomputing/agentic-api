@@ -6,7 +6,9 @@ import httpx
 from fastapi import HTTPException, Request, status
 from pydantic_ai.models import Model
 from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers import Provider
 from pydantic_ai.providers.alibaba import AlibabaProvider
+from pydantic_ai.providers.openai import OpenAIProvider
 
 from agentic.config.agent import AgentSettings
 from agentic.config.fastapi import FastAPISettings
@@ -29,6 +31,22 @@ def get_agent_settings(request: Request) -> AgentSettings:
     """Dependency to retrieve the Agent state settings."""
     return request.app.state.agent_settings
 
+def _build_provider(
+    agent_config: AgentSettings, http_client: httpx.AsyncClient
+) -> Provider:
+    """Decouples provider construction from configuration."""
+    api_key = agent_config.api_key.get_secret_value()
+    if agent_config.provider == "openai_compatible":
+        if not agent_config.provider_base_url:
+            raise ValueError(
+                "AGENT_BASE_URL is required when AGENT_PROVIDER=openai_compatible"
+            )
+        return OpenAIProvider(
+            api_key=api_key,
+            base_url=agent_config.provider_base_url,
+            http_client=http_client,
+        )
+    return AlibabaProvider(api_key=api_key, http_client=http_client)
 
 def build_conversational_model(
     agent_config: AgentSettings,
@@ -48,13 +66,11 @@ def build_conversational_model(
             timeout=http_timeout, connect=_HTTP_CONNECT_TIMEOUT_SECONDS
         ),
     )
-    provider = AlibabaProvider(
-        api_key=agent_config.api_key.get_secret_value(),
-        http_client=http_client,
+    model = OpenAIChatModel(
+        model_name=agent_config.model,
+        provider=_build_provider(agent_config, http_client),
     )
-    model = OpenAIChatModel(model_name=agent_config.model, provider=provider)
     return model, http_client
-
 
 def get_conversational_agent_model(request: Request) -> Model:
     """Dependency returning the shared, lifespan-managed LLM model."""
