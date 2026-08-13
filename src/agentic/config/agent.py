@@ -25,7 +25,7 @@ class AgentSettings(BaseSettings):
         description="Override endpoint required for OpenAI compatible providers.",
     )
     model: str = Field(description="The model to be used")
-    token_limit: int = Field(
+    token_total_limit: int = Field(
         gt=0,
         le=2_000_000,
         description="The maximum amount of tokens to use for a session",
@@ -56,4 +56,18 @@ class AgentSettings(BaseSettings):
         ge=0,
         le=128,
         description="Maximum agent executions in flight per instance before load shedding."
+    )
+
+    tool_calls_limit: int = Field(
+        default=10,
+        gt=0,
+        le=50,
+        description="Maximum tool invocations per agent run",
+    )
+
+    output_tokens_limit: int = Field(
+        default=100_000,
+        gt=0,
+        le=2_000_000,
+        description="Maximum generated tokens per agent run",
     )

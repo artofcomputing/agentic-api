@@ -57,10 +57,16 @@ async def run_conversational_agent(
     try:
         logger.info("Executing conversational agent instruction")
         async with asyncio.timeout(agent_settings.request_timeout):
+            # NOTE: Count Tokens before request is not implemented for OpenAI compatible
+            # endpoints, therefore it cannot be enabled to save costs with Pydantic AI.
             result = await conversational_agent.run(
                 payload.user_instruction,
                 model=model,
-                usage_limits=UsageLimits(total_tokens_limit=agent_settings.token_limit),
+                usage_limits=UsageLimits(
+                    total_tokens_limit=agent_settings.token_total_limit,
+                    tool_calls_limit=agent_settings.tool_calls_limit,
+                    output_tokens_limit=agent_settings.output_tokens_limit,
+                ),
                 toolsets=[time_toolset],
                 retries=agent_settings.retries,
             )

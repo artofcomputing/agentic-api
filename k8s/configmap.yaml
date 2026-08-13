@@ -32,7 +32,9 @@ data:
   AGENT_PROVIDER: "alibaba"
   AGENT_PROVIDER_BASE_URL: "https://example.com"
   AGENT_MODEL: "qwen3.7-flash"
-  AGENT_TOKEN_LIMIT: "1000000"
+  AGENT_TOKEN_TOTAL_LIMIT: "1000000"
+  AGENT_TOOL_CALLS_LIMIT: "10" # Maximum tool invocations per agent run
+  AGENT_OUTPUT_TOKENS_LIMIT: "100000" # Maximum generated tokens per agent run
   AGENT_INSTRUCTION_LIMIT: "200000" # maximum *characters* per user instruction
   AGENT_REQUEST_TIMEOUT: "60" # end-to-end deadline (seconds) per agent request
   AGENT_RETRIES: "1" # tool/output retries per run; each retry is a full LLM round-trip
