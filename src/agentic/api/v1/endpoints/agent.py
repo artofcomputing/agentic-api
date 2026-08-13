@@ -10,6 +10,7 @@ from agentic.ai.agents.conversational.agent import (
 )
 from agentic.ai.tools import time_toolset
 from agentic.api.deps import (
+    agent_capacity,
     get_agent_settings,
     get_conversational_agent_model,
 )
@@ -31,6 +32,7 @@ async def run_conversational_agent(
     payload: AgentRunRequest,
     agent_settings: AgentSettings = Depends(get_agent_settings),
     model: Model = Depends(get_conversational_agent_model),
+    _capacity: None = Depends(agent_capacity),
 ) -> AgentRunResponse:
     """Conversational Agent"""
     # Enforce the configurable instruction length limit. The hard ceiling

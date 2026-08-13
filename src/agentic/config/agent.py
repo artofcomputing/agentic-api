@@ -38,7 +38,12 @@ class AgentSettings(BaseSettings):
         default=1,
         ge=0,
         le=5,
-        description=(
-            "Tool/output retries per agent run (each retry is a full LLM round-trip)."
-        ),
+        description="Tool/output retries per agent run (each retry is a full LLM round-trip).",
+    )
+
+    max_concurrent_runs: int = Field(
+        default=3,
+        ge=0,
+        le=128,
+        description="Maximum agent executions in flight per instance before load shedding."
     )

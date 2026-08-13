@@ -22,13 +22,14 @@ data:
   FASTAPI_REDOC_URL: "redoc"
   FASTAPI_HOST: "0.0.0.0" # Pods must bind all interfaces to receive probe/service traffic
   FASTAPI_PORT: "8000"
-  FASTAPI_CORS_ORIGINS: '["*"]' # tighten to explicit scheme://host[:port] origins in production
+  FASTAPI_CORS_ORIGINS: '["127.0.0.1"]' # tighten to explicit scheme://host[:port] origins in production
   # --- AGENT (env prefix: AGENT_) ---
   AGENT_MODEL: "qwen3.7-flash"
   AGENT_TOKEN_LIMIT: "1000000"
   AGENT_INSTRUCTION_LIMIT: "200000" # maximum *characters* per user instruction
   AGENT_REQUEST_TIMEOUT: "60" # end-to-end deadline (seconds) per agent request
   AGENT_RETRIES: "1" # tool/output retries per run; each retry is a full LLM round-trip
+  AGENT_MAX_CONCURRENT_RUNS: "3"
   # --- LOGGING (env prefix: LOG_) ---
   LOG_LEVEL: "INFO"
   LOG_JSON_FORMAT: "True"

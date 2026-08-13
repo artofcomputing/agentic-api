@@ -1,7 +1,9 @@
+import asyncio
 import logging
+from collections.abc import AsyncIterator
 
 import httpx
-from fastapi import Request
+from fastapi import HTTPException, Request, status
 from pydantic_ai.models import Model
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.alibaba import AlibabaProvider
@@ -57,3 +59,20 @@ def build_conversational_model(
 def get_conversational_agent_model(request: Request) -> Model:
     """Dependency returning the shared, lifespan-managed LLM model."""
     return request.app.state.agent_model
+
+async def agent_capacity(request: Request) -> AsyncIterator[None]:
+    """Bounded concurrency gate: rejects with 429 when all agent slots are busy.
+
+    Async-generator dependency: the semaphore is held for the whole request and
+    released even if the handler raises or the client disconnects (cancellation).
+    """
+    semaphore: asyncio.Semaphore = request.app.state.agent_concurrency
+    if semaphore.locked():  # all slots busy -> shed load instead of queueing
+        logger.warning("Agent concurrency limit reached; shedding request")
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Server is at capacity; retry later",
+            headers={"Retry-After": "5"},
+        )
+    async with semaphore:
+        yield

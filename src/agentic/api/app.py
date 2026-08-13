@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -70,6 +71,8 @@ def create_app(
     app.state.fastapi_settings = fastapi_settings
     # Store Agent config state
     app.state.agent_settings = agent_settings
+    # Bounded concurrency gate for agents
+    app.state.agent_concurrency = asyncio.Semaphore(agent_settings.max_concurrent_runs)
 
     # Configure CORS: If '*' is present in allowed origins then
     # allow_credentials must be False to satisfy standard browser security
