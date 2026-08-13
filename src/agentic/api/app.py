@@ -77,13 +77,18 @@ def create_app(
     # Configure CORS: If '*' is present in allowed origins then
     # allow_credentials must be False to satisfy standard browser security
     allow_credentials = "*" not in fastapi_settings.cors_origins
+    if not allow_credentials:
+        logger.warning(
+            "CORS wildcard origin enabled. "
+                "Set FASTAPI_CORS_ORIGINS to explicit origins in production.")
 
+    # noinspection bad-argument-type
     app.add_middleware(
         CORSMiddleware,
         allow_origins=fastapi_settings.cors_origins,
         allow_credentials=allow_credentials,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=fastapi_settings.cors_methods,
+        allow_headers=fastapi_settings.cors_headers,
     )
 
     # Register unauthenticated probe routes (/livez, /readyz) OUTSIDE the

@@ -22,7 +22,12 @@ data:
   FASTAPI_REDOC_URL: "redoc"
   FASTAPI_HOST: "0.0.0.0" # Pods must bind all interfaces to receive probe/service traffic
   FASTAPI_PORT: "8000"
+  # --- FASTAPI CORS Settings (env prefix: FASTAPI_) ---
+  # These settings follow the same semantics as FastAPI, such as allowing empty lists
+  # and globs. Check FastAPI docs for more information
   FASTAPI_CORS_ORIGINS: '["127.0.0.1"]' # tighten to explicit scheme://host[:port] origins in production
+  FASTAPI_CORS_METHODS: '["GET", "POST"]'
+  FASTAPI_CORS_HEADERS: '["x-api-key","content-type"]'
   # --- AGENT (env prefix: AGENT_) ---
   AGENT_MODEL: "qwen3.7-flash"
   AGENT_TOKEN_LIMIT: "1000000"
