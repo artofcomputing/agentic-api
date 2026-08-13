@@ -3,6 +3,12 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic_ai import UsageLimitExceeded, UsageLimits
+from pydantic_ai.exceptions import (
+    AgentRunError,
+    ModelAPIError,
+    ModelHTTPError,
+    UnexpectedModelBehavior,
+)
 from pydantic_ai.models import Model
 
 from agentic.ai.agents.conversational.agent import (
@@ -67,6 +73,7 @@ async def run_conversational_agent(
             "Agent execution timed out after %s seconds",
             agent_settings.request_timeout,
         )
+
         raise HTTPException(
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
             detail="Agent execution timed out",
@@ -74,13 +81,56 @@ async def run_conversational_agent(
 
     except UsageLimitExceeded:
         logger.warning("Agent usage limit exceeded")
+
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Usage limit exceeded",
         )
 
+    except ModelHTTPError as exc:
+        # Upstream provider returned an HTTP error (auth, throttling, outage).
+
+        retry_after = getattr(exc, "retry_after", None)
+
+        headers = {"Retry-After": str(retry_after)} if retry_after else None
+
+        if exc.status_code in (401, 403):
+            logger.error(
+                "LLM provider rejected credentials (upstream %s)", exc.status_code
+            )
+
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="LLM provider authentication failure",
+            )
+
+        if exc.status_code == 429:
+            logger.warning("LLM provider rate-limited the request")
+
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="LLM provider busy",
+                headers=headers,
+            )
+
+        logger.warning("LLM provider error (upstream %s)", exc.status_code)
+
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="LLM provider request failed",
+        )
+
+    except ModelAPIError, UnexpectedModelBehavior, AgentRunError:
+        logger.exception("LLM communication/protocol failure")
+
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="LLM provider communication failure",
+        )
+
     except Exception:
         logger.exception("An error occurred during the conversational agent execution")
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Agent execution failed",
