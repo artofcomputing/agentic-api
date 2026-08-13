@@ -28,10 +28,10 @@ async def lifespan(app: FastAPI):
         # The LLM model must be constructible from configuration
         # Built once here; requests reuse the shared instance
         # via app.state (no per-request provider/client construction).
-        model, http_client = build_conversational_model(app.state.agent_settings)
+        model, http_client = await build_conversational_model(app.state.agent_settings)
     except Exception as e:
         logger.critical("Fail-Fast Startup Error: %s", e)
-        raise SystemExit(1) from e
+        raise RuntimeError("Startup configuration checks failed") from e
 
     # Injects the model in the server state and mark the app ready
     # so the Kubernetes readiness probe (/readyz) starts succeeding.

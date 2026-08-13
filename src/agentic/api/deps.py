@@ -48,15 +48,10 @@ def _build_provider(
         )
     return AlibabaProvider(api_key=api_key, http_client=http_client)
 
-def build_conversational_model(
+async def build_conversational_model(
     agent_config: AgentSettings,
 ) -> tuple[OpenAIChatModel, httpx.AsyncClient]:
-    """Builds the shared LLM model plus the HTTP client it owns (closed at shutdown).
-
-    The caller owns the returned ``httpx.AsyncClient`` and must close it
-    deterministically (application lifespan shutdown): the provider does not
-    own it and will therefore never close it itself.
-    """
+    """Builds the shared LLM model plus the HTTP client it owns"""
     http_timeout = max(
         float(agent_config.request_timeout) - _HTTP_TIMEOUT_MARGIN_SECONDS,
         1.0,
@@ -66,14 +61,19 @@ def build_conversational_model(
             timeout=http_timeout, connect=_HTTP_CONNECT_TIMEOUT_SECONDS
         ),
     )
-    model = OpenAIChatModel(
-        model_name=agent_config.model,
-        provider=_build_provider(agent_config, http_client),
-    )
+
+    try:
+        model = OpenAIChatModel(
+            model_name=agent_config.model,
+            provider=_build_provider(agent_config, http_client),
+        )
+    except Exception:
+        await http_client.aclose()
+        raise
     return model, http_client
 
 def get_conversational_agent_model(request: Request) -> Model:
-    """Dependency returning the shared, lifespan-managed LLM model."""
+    """Dependency returning the shared, lifespan-managed LLM model"""
     return request.app.state.agent_model
 
 async def agent_capacity(request: Request) -> AsyncIterator[None]:
