@@ -3,6 +3,7 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
+_VALID_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
 
 def _get_reserved_attrs() -> set[str]:
     dummy_record = logging.LogRecord("", 0, "", 0, "", None, None)
@@ -30,6 +31,9 @@ class JsonFormatter(logging.Formatter):
         # Include traceback details if an exception is logged
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
+        # Include stack details if an exception is logged
+        if record.stack_info:
+            payload["stack_info"] = self.formatStack(record.stack_info)
 
         # Merge any custom fields passed via extra={...}
         for key, value in record.__dict__.items():
@@ -45,6 +49,12 @@ class JsonFormatter(logging.Formatter):
 
 def setup_logging(log_level: str = "INFO", json_format: bool = True) -> None:
     """Configures global logging stream handler using either JSON or standard formatting."""
+    name = log_level.strip().upper()
+    if name not in _VALID_LEVELS:
+        raise ValueError(
+            f"Invalid LOG_LEVEL {log_level!r}; expected one of {sorted(_VALID_LEVELS)}"
+        )
+
     root_logger = logging.getLogger()
 
     # Clear existing handlers to prevent duplicate logging
@@ -62,7 +72,4 @@ def setup_logging(log_level: str = "INFO", json_format: bool = True) -> None:
         )
 
     root_logger.addHandler(handler)
-
-    # Convert log_level string to standard logging level attribute
-    numeric_level = getattr(logging, log_level.upper(), logging.INFO)
-    root_logger.setLevel(numeric_level)
+    root_logger.setLevel(logging.getLevelNamesMapping()[name])
