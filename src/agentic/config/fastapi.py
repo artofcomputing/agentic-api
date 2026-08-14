@@ -55,7 +55,7 @@ class FastAPISettings(BaseSettings):
         description="List of headers allowed to make CORS requests."
     )
 
-    @field_validator("cors_origins","cors_methods","cors_headers", mode="before")
+    @field_validator("cors_origins", "cors_methods", "cors_headers", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: Any) -> Any:
         """Parses the CORS origins JSON array from string-based sources.

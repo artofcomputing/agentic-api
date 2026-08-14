@@ -31,6 +31,7 @@ def get_agent_settings(request: Request) -> AgentSettings:
     """Dependency to retrieve the Agent state settings."""
     return request.app.state.agent_settings
 
+
 def _build_provider(
     agent_config: AgentSettings, http_client: httpx.AsyncClient
 ) -> Provider:
@@ -47,6 +48,7 @@ def _build_provider(
             http_client=http_client,
         )
     return AlibabaProvider(api_key=api_key, http_client=http_client)
+
 
 async def build_conversational_model(
     agent_config: AgentSettings,
@@ -72,9 +74,11 @@ async def build_conversational_model(
         raise
     return model, http_client
 
+
 def get_conversational_agent_model(request: Request) -> Model:
     """Dependency returning the shared, lifespan-managed LLM model"""
     return request.app.state.agent_model
+
 
 async def agent_capacity(request: Request) -> AsyncIterator[None]:
     """Bounded concurrency gate: rejects with 429 when all agent slots are busy.

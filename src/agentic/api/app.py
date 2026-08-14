@@ -80,7 +80,8 @@ def create_app(
     if not allow_credentials:
         logger.warning(
             "CORS wildcard origin enabled. "
-                "Set FASTAPI_CORS_ORIGINS to explicit origins in production.")
+            "Set FASTAPI_CORS_ORIGINS to explicit origins in production."
+        )
 
     # noinspection bad-argument-type
     app.add_middleware(

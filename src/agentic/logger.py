@@ -5,6 +5,7 @@ from typing import Any
 
 _VALID_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
 
+
 def _get_reserved_attrs() -> set[str]:
     dummy_record = logging.LogRecord("", 0, "", 0, "", None, None)
     reserved = {a for a in dir(dummy_record) if "__" not in a}

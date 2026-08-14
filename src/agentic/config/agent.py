@@ -16,7 +16,7 @@ class AgentSettings(BaseSettings):
     )
 
     api_key: SecretStr = Field(description="The API key required for LLM model")
-    provider : Literal["openai_compatible", "alibaba"] = Field(
+    provider: Literal["openai_compatible", "alibaba"] = Field(
         default="alibaba",
         description="LLM provider backend to be used by the conversational agent.",
     )
@@ -55,7 +55,7 @@ class AgentSettings(BaseSettings):
         default=3,
         ge=0,
         le=128,
-        description="Maximum agent executions in flight per instance before load shedding."
+        description="Maximum agent executions in flight per instance before load shedding.",
     )
 
     tool_calls_limit: int = Field(
