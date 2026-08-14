@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic_ai.models import Model
 
 from agentic.ai.prompts.loader import get_prompt
 from agentic.api.deps import build_conversational_model
@@ -49,6 +50,7 @@ async def lifespan(app: FastAPI):
 def create_app(
     fastapi_settings: FastAPISettings,
     agent_settings: AgentSettings,
+    agent_model: Model | None = None,  # test seam
 ) -> FastAPI:
     """Application factory for the FastAPI AI Agent server."""
 
@@ -73,6 +75,9 @@ def create_app(
     app.state.agent_settings = agent_settings
     # Bounded concurrency gate for agents
     app.state.agent_concurrency = asyncio.Semaphore(agent_settings.max_concurrent_runs)
+
+    # Test Seam for DeterministicModel and others, lifespan will override on startup
+    app.state.agent_model = agent_model
 
     # Configure CORS: If '*' is present in allowed origins then
     # allow_credentials must be False to satisfy standard browser security
