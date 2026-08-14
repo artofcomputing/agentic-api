@@ -40,7 +40,7 @@ def _build_provider(
     if agent_config.provider == "openai_compatible":
         if not agent_config.provider_base_url:
             raise ValueError(
-                "AGENT_BASE_URL is required when AGENT_PROVIDER=openai_compatible"
+                "AGENT_PROVIDER_BASE_URL is required when AGENT_PROVIDER=openai_compatible"
             )
         return OpenAIProvider(
             api_key=api_key,
