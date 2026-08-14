@@ -7,7 +7,7 @@ requires-python = ">=3.14"
 dependencies = [
     "pydantic>=2.13",
     "pydantic-settings>=2.14",
-    "pydantic-ai>=2.27",
+    "pydantic-ai==2.30.0",
     "httpx>=0.28",
     "fastapi>=0.141",
     "uvicorn>=0.52",
