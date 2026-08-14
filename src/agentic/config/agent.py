@@ -55,7 +55,7 @@ class AgentSettings(BaseSettings):
 
     max_concurrent_runs: int = Field(
         default=3,
-        ge=0,
+        gt=0,
         le=128,
         description="Maximum agent executions in flight per instance before load shedding.",
     )
