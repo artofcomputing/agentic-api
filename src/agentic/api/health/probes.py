@@ -41,9 +41,11 @@ async def liveness() -> dict[str, str]:
 async def readiness(request: Request) -> dict[str, str]:
     """Readiness probe target.
 
-    Returns ``503`` until the application lifespan fail-fast checks have
-    completed (``app.state.ready``). Kubernetes removes the Pod from the
-    Service endpoints while this probe fails, without restarting it.
+    ready is True after the lifespan fail-fast checks pass
+    (prompt readable + LLM model constructible). It deliberately does NOT
+    verify upstream LLM provider reachability: transient provider flaps must
+    not remove healthy Pods from the Service. Provider failures are handled
+    by the error-mapping layer (agent endpoint -> 502/503).
     """
     if not getattr(request.app.state, "ready", False):
         logger.debug("Readiness probe failed: application not ready")

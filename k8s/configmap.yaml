@@ -30,7 +30,8 @@ data:
   FASTAPI_CORS_HEADERS: '["x-api-key","content-type"]'
   # --- AGENT (env prefix: AGENT_) ---
   AGENT_PROVIDER: "alibaba"
-  AGENT_PROVIDER_BASE_URL: "https://example.com"
+  # AGENT_PROVIDER_BASE_URL is provider-specific; set it only when
+  # AGENT_PROVIDER=openai_compatible, in the Secret or per-environment ConfigMap.
   AGENT_MODEL: "qwen3.7-flash"
   AGENT_TOKEN_TOTAL_LIMIT: "1000000"
   AGENT_TOOL_CALLS_LIMIT: "10" # Maximum tool invocations per agent run

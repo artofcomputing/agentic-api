@@ -31,7 +31,7 @@ FROM python:3.14-slim AS runner
 LABEL org.opencontainers.image.title="agentic-api" \
       org.opencontainers.image.description="A modular, cloud-native API for AI Agents powered by FastAPI, Pydantic, and Pydantic AI" \
       org.opencontainers.image.version="0.1.0" \
-      org.opencontainers.image.source="https://github.com/your-org/agentic-api"
+      org.opencontainers.image.source="https://github.com/artofcomputing/agentic-api"
 
 WORKDIR /app
 

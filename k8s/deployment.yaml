@@ -14,6 +14,9 @@ metadata:
     app.kubernetes.io/name: agentic-api
     app.kubernetes.io/component: api
 spec:
+  # NOTE: agent_capacity (src/agentic/api/deps.py) is a per-Pod semaphore.
+  # Effective concurrency ceiling = replicas x AGENT_MAX_CONCURRENT_RUNS.
+  # For strict global budgets, front this Service with a gateway/Redis limiter.
   replicas: 1
   selector:
     matchLabels:
