@@ -6,7 +6,7 @@
 #
 # Secrets (API keys) do NOT belong here: they live in the `agentic-api-secrets`
 # Secret object, which is created at deploy time and never committed to the
-# repository (see README.md -> "Running on minikube").
+# repository (see README.md -> "Running on Minikube").
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -25,7 +25,7 @@ data:
   # --- FASTAPI CORS Settings (env prefix: FASTAPI_) ---
   # These settings follow the same semantics as FastAPI, such as allowing empty lists
   # and globs. Check FastAPI docs for more information
-  FASTAPI_CORS_ORIGINS: '["127.0.0.1"]' # tighten to explicit scheme://host[:port] origins in production
+  FASTAPI_CORS_ORIGINS: '["http://127.0.0.1:3000","http://localhost:3000"]' # tighten to explicit scheme://host[:port] origins in production
   FASTAPI_CORS_METHODS: '["GET", "POST"]'
   FASTAPI_CORS_HEADERS: '["x-api-key","content-type"]'
   # --- AGENT (env prefix: AGENT_) ---

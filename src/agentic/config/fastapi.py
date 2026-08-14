@@ -75,3 +75,15 @@ class FastAPISettings(BaseSettings):
                 candidate = candidate[1:-1]
             return json.loads(candidate)
         return value
+
+    @field_validator("cors_origins", mode="after")
+    @classmethod
+    def validate_cors_origins(cls, value: list[str]) -> list[str]:
+        """Require explicit scheme so default configs can never silently no-match."""
+        for origin in value:
+            if origin != "*" and not origin.startswith(("http://", "https://")):
+                raise ValueError(
+                    "CORS origin must include scheme and port, e.g. "
+                    f"'http://127.0.0.1:3000'; got {origin!r}"
+                )
+        return value
