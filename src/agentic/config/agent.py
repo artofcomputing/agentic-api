@@ -28,7 +28,9 @@ class AgentSettings(BaseSettings):
     token_total_limit: int = Field(
         gt=0,
         le=2_000_000,
-        description="The maximum amount of tokens to use for a session",
+        description=(
+            "Maximum tokens for a single agent run (each request is a fresh, "
+            "stateless run; cross-request budgets require an external limiter)"),
     )
 
     instruction_limit: int = Field(
