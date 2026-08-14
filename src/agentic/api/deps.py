@@ -53,17 +53,18 @@ def _build_provider(
 async def build_conversational_model(
     agent_config: AgentSettings,
 ) -> tuple[OpenAIChatModel, httpx.AsyncClient]:
-    """Builds the shared LLM model plus the HTTP client it owns"""
-    http_timeout = max(
-        float(agent_config.request_timeout) - _HTTP_TIMEOUT_MARGIN_SECONDS,
-        1.0,
-    )
+    """Builds the shared LLM model plus the HTTP client it owns (sync)."""
+    if agent_config.request_timeout <= _HTTP_TIMEOUT_MARGIN_SECONDS:
+        raise ValueError(
+            "AGENT_REQUEST_TIMEOUT must exceed the 5s HTTP margin; "
+            f"got {agent_config.request_timeout}s"
+        )
+    http_timeout = float(agent_config.request_timeout) - _HTTP_TIMEOUT_MARGIN_SECONDS
     http_client = httpx.AsyncClient(
         timeout=httpx.Timeout(
             timeout=http_timeout, connect=_HTTP_CONNECT_TIMEOUT_SECONDS
         ),
     )
-
     try:
         model = OpenAIChatModel(
             model_name=agent_config.model,
