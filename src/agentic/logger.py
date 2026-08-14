@@ -1,5 +1,6 @@
 import json
 import logging
+import typing
 from datetime import UTC, datetime
 from typing import Any
 
@@ -21,6 +22,7 @@ IGNORED_ATTRS: set[str] = {"color_message"}
 class JsonFormatter(logging.Formatter):
     """Custom logging formatter that outputs log records as single-line JSON objects."""
 
+    @typing.override
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, Any] = {
             "timestamp": datetime.fromtimestamp(record.created, tz=UTC).isoformat(),
