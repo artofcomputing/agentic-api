@@ -2,6 +2,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
+import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic_ai.models import Model
@@ -22,21 +23,28 @@ async def lifespan(app: FastAPI):
     # Readiness starts false; /readyz flips green only after the checks pass.
     app.state.ready = False
     logger.info("Performing fail-fast startup configuration checks...")
+    # Set only when this handler builds the real model; a pre-seeded test
+    # model owns no HTTP client for us to close.
+    http_client: httpx.AsyncClient | None = None
     try:
         # The prompt file must be readable before serving traffic
         # (also warms the lru_cache used on the request path).
         get_prompt("conversational", "SYSTEM_PROMPT")
-        # The LLM model must be constructible from configuration
-        # Built once here; requests reuse the shared instance
-        # via app.state (no per-request provider/client construction).
-        model, http_client = await build_conversational_model(app.state.agent_settings)
+        if app.state.agent_model is None:
+            # No test model pre-seeded: build the shared LLM model once here;
+            # requests reuse it via app.state (no per-request provider/client
+            # construction). A pre-seeded model skips this entirely.
+            model, http_client = await build_conversational_model(
+                app.state.agent_settings
+            )
+            # Injects the model in the server state.
+            app.state.agent_model = model
     except Exception as e:
         logger.critical("Fail-Fast Startup Error: %s", e)
         raise RuntimeError("Startup configuration checks failed") from e
 
-    # Injects the model in the server state and mark the app ready
-    # so the Kubernetes readiness probe (/readyz) starts succeeding.
-    app.state.agent_model = model
+    # Mark the app ready so the Kubernetes readiness probe (/readyz)
+    # starts succeeding.
     app.state.ready = True
     logger.info("Fail-fast configuration checks passed successfully.")
     try:
@@ -44,7 +52,8 @@ async def lifespan(app: FastAPI):
     # Teardown
     finally:
         app.state.ready = False
-        await http_client.aclose()
+        if http_client is not None:  # only close clients we created
+            await http_client.aclose()
 
 
 def create_app(
@@ -76,7 +85,8 @@ def create_app(
     # Bounded concurrency gate for agents
     app.state.agent_concurrency = asyncio.Semaphore(agent_settings.max_concurrent_runs)
 
-    # Test Seam for DeterministicModel and others, lifespan will override on startup
+    # Test seam for deterministic models (TestModel, etc.); lifespan honors a
+    # pre-seeded model and only builds the real LLM model when none is provided.
     app.state.agent_model = agent_model
 
     # Configure CORS: If '*' is present in allowed origins then
