@@ -5,12 +5,8 @@ registered at the application root, OUTSIDE the authenticated ``/api/v1``
 boundary, so orchestrators never need API credentials and probe traffic is
 unaffected by secret rotation.
 
-* ``/livez``  -- Liveness: is the process (event loop) still responsive?
-* ``/readyz`` -- Readiness: has startup completed, can we serve traffic?
-
-The deprecated single ``/healthz`` convention is intentionally avoided in
-favor of split liveness/readiness endpoints, mirroring the Kubernetes API
-server's own ``/livez`` and ``/readyz`` routes.
+* ``/livez``  -- Liveness
+* ``/readyz`` -- Readiness
 """
 
 import logging

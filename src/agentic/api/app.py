@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from agentic.ai.prompts.loader import get_prompt
 from agentic.api.deps import build_conversational_model
-from agentic.api.probes import router as probes_router
+from agentic.api.health.probes import router as probes_router
 from agentic.api.v1.router import api_router
 from agentic.config.agent import AgentSettings
 from agentic.config.fastapi import FastAPISettings
