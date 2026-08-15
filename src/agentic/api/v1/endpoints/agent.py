@@ -126,7 +126,7 @@ async def run_conversational_agent(
             detail="LLM provider request failed",
         )
 
-    except (ModelAPIError, UnexpectedModelBehavior, AgentRunError):
+    except ModelAPIError, UnexpectedModelBehavior, AgentRunError:
         logger.exception("LLM communication/protocol failure")
 
         raise HTTPException(

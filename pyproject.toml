@@ -26,7 +26,15 @@ dev = [
     "ty>=0.0.69",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.0",
+    "pytest-cov>=7.1.0",
 ]
+[tool.coverage.run]
+source = ["src/agentic"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70
 
 [tool.ruff.lint]
 ignore = ["B008"]
@@ -35,11 +43,11 @@ ignore = ["B008"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/agentic"]
-
 [tool.ty.src]
 include = ["src", "tests"]
 
 [tool.ty.rules]
 all = "error"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentic"]

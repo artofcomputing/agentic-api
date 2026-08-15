@@ -32,11 +32,14 @@ jobs:
       - name: Run Linter
         run: uv run ruff check src tests
 
+      - name: Check Formatting
+        run: uv run ruff format --check src tests
+
       - name: Run Type Checker
         run: uv run ty check
 
       - name: Run Tests
-        run: uv run pytest
+        run: uv run pytest --cov --cov-report=term-missing
 
   build:
     needs: lint-and-test
