@@ -55,6 +55,12 @@ class FastAPISettings(BaseSettings):
         description="List of headers allowed to make CORS requests."
     )
 
+    max_body_bytes: int = Field(
+        default=2_097_152,  # 2 MiB; covers MAX_INSTRUCTION_CHARS + JSON overhead + room for API growth
+        gt=0,
+        description="Maximum accepted request body size in bytes.",
+    )
+
     @field_validator("cors_origins", "cors_methods", "cors_headers", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: Any) -> Any:

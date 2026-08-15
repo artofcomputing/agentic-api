@@ -10,6 +10,7 @@ from pydantic_ai.models import Model
 from agentic.ai.prompts.loader import get_prompt
 from agentic.api.deps import build_conversational_model
 from agentic.api.health.probes import router as probes_router
+from agentic.api.middleware import RequestBodyLimitMiddleware
 from agentic.api.v1.router import api_router
 from agentic.config.agent import AgentSettings
 from agentic.config.fastapi import FastAPISettings
@@ -105,6 +106,12 @@ def create_app(
         allow_credentials=allow_credentials,
         allow_methods=fastapi_settings.cors_methods,
         allow_headers=fastapi_settings.cors_headers,
+    )
+
+    # noinspection bad-argument-type
+    app.add_middleware(
+        RequestBodyLimitMiddleware,
+        max_body_bytes=fastapi_settings.max_body_bytes,
     )
 
     # Register unauthenticated probe routes (/livez, /readyz) OUTSIDE the

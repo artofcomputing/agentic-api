@@ -11,6 +11,7 @@ dependencies = [
     "httpx>=0.28",
     "fastapi>=0.141",
     "uvicorn>=0.52",
+    "starlette>=1.6.0",
 ]
 
 [project.scripts]

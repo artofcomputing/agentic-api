@@ -28,6 +28,7 @@ data:
   FASTAPI_CORS_ORIGINS: '["http://127.0.0.1:3000","http://localhost:3000"]' # tighten to explicit scheme://host[:port] origins in production
   FASTAPI_CORS_METHODS: '["GET", "POST"]'
   FASTAPI_CORS_HEADERS: '["x-api-key","content-type"]'
+  FASTAPI_MAX_BODY_BYTES: "2097152" # Maximum accepted request body size in bytes
   # --- AGENT (env prefix: AGENT_) ---
   AGENT_PROVIDER: "alibaba"
   # AGENT_PROVIDER_BASE_URL is provider-specific; set it only when
