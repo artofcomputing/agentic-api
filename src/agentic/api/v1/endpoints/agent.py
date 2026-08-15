@@ -20,7 +20,7 @@ from agentic.api.deps import (
     get_agent_settings,
     get_conversational_agent_model,
 )
-from agentic.api.schema import AgentRunRequest, AgentRunResponse
+from agentic.ai.agents.conversational.schema import AgentRunRequest, AgentRunResponse
 from agentic.config.agent import AgentSettings
 
 logger = logging.getLogger(__name__)
