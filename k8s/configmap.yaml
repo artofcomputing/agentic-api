@@ -16,9 +16,12 @@ metadata:
     app.kubernetes.io/component: api
 data:
   # --- FASTAPI (env prefix: FASTAPI_) ---
-  FASTAPI_DOCS: "True" # set "False" in production (disables /docs)
+  # Interactive API docs are DISABLED in the cluster by default. Enable only
+  # deliberately in a trusted environment (they are unauthenticated and expose
+  # the full API surface).
+  FASTAPI_DOCS: "False"
   FASTAPI_DOCS_URL: "docs"
-  FASTAPI_REDOC: "True" # set "False" in production (disables /redoc)
+  FASTAPI_REDOC: "False"
   FASTAPI_REDOC_URL: "redoc"
   FASTAPI_HOST: "0.0.0.0" # Pods must bind all interfaces to receive probe/service traffic
   FASTAPI_PORT: "8000"

@@ -98,6 +98,12 @@ def create_app(
             "CORS wildcard origin enabled. "
             "Set FASTAPI_CORS_ORIGINS to explicit origins in production."
         )
+    if fastapi_settings.docs or fastapi_settings.redoc:
+        logger.warning(
+            "Interactive API docs are ENABLED. "
+            "Set FASTAPI_DOCS/FASTAPI_REDOC to False in production; "
+            "/docs and /redoc are unauthenticated and expose the API surface."
+        )
 
     # noinspection bad-argument-type
     app.add_middleware(
