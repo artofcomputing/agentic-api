@@ -8,23 +8,19 @@ A modular, cloud-native API for AI Agents powered by FastAPI, Pydantic, and Pyda
 
 - **Python**: `>= 3.14`
 - **Package Manager**: `uv`
-- **Docker**
-- **Kubernetes tooling**: `kubectl`, `minikube`
+- **Docker** OR **Kubernetes tooling**: `kubectl`, `minikube`
 
 ---
 
 ## Configuration
 
-All configuration is read from environment variables; `.env.example` is the
-authoritative template for the variable schema.
+All configuration is read from environment variables; `.env.example` is the authoritative template for the variable schema. For local development, copy the `.env.example` to `.env` 
+and fill in the values.
 
 | Scope                  | Variables                                                                        | Kubernetes source                                                      |
 |:-----------------------|:---------------------------------------------------------------------------------|:-----------------------------------------------------------------------|
 | Non-sensitive settings | `FASTAPI_DOCS`, `FASTAPI_HOST`, `AGENT_MODEL`, `AGENT_TOKEN_LIMIT`, `LOG_*`, ... | `ConfigMap/agentic-api-config` (`k8s/configmap.yaml`)                  |
-| Secrets                | `FASTAPI_API_KEY`,                                                               | `Secret/agentic-api-secrets` (created at deploy time, never committed) |
-
-For **local development only**, copy `.env.example` to `.env` and fill in the
-values. Never commit `.env` or real credentials to version control.
+| Secrets                | `FASTAPI_API_KEY`,`AGENT_API_KEY`                                                | `Secret/agentic-api-secrets` (created at deploy time)                  |
 
 ---
 
@@ -81,11 +77,16 @@ uv run python -m agentic.main
      -H "Content-Type: application/json" \
      -d '{"user_instruction": "Hello!"}'
    ```
+7. Cleanup
+   ```bash
+   kubectl delete -f k8s/
+   kubectl delete secret agentic-api-secrets
+   minikube stop
+   ```
 
-### Health management
+## Health management
 
-Container health is managed exclusively by Kubernetes probes configured in
-`k8s/deployment.yaml`:
+The application health is managed exclusively by Kubernetes style probes configured in `k8s/deployment.yaml`:
 
 | Probe | Endpoint | Purpose |
 | :--- | :--- | :--- |
@@ -93,13 +94,4 @@ Container health is managed exclusively by Kubernetes probes configured in
 | Liveness | `GET /livez` | Restarts the container if the event loop hangs |
 | Readiness | `GET /readyz` | Removes the Pod from the Service until startup checks pass |
 
-Both endpoints are unauthenticated and registered outside the `/api/v1` auth
-boundary.
-
-### Cleanup
-
-```bash
-kubectl delete -f k8s/
-kubectl delete secret agentic-api-secrets
-minikube stop
-```
+Both endpoints are unauthenticated and registered outside the `/api/v1` auth boundary.
