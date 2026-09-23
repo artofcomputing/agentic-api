@@ -95,3 +95,9 @@ The application health is managed exclusively by Kubernetes style probes configu
 | Readiness | `GET /readyz` | Removes the Pod from the Service until startup checks pass |
 
 Both endpoints are unauthenticated and registered outside the `/api/v1` auth boundary.
+
+## Improvement Areas
+* `pyproject.toml` needs to be re-organized and optimized, ruff linter should have a better category base.
+* Implement OTel (tracing, logs, metrics) instead of custom logs utility.
+* Test Coverage 90% minimum.
+* Decouple agent methods to not use the decorator so agent construction is not initialized when imported.
