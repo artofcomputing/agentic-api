@@ -1,10 +1,10 @@
 import asyncio
-import logging
 from contextlib import asynccontextmanager
+import logging
 
-import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import httpx
 from pydantic_ai.models import Model
 
 from agentic.ai.prompts.loader import get_prompt

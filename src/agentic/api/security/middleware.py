@@ -1,6 +1,5 @@
 """Request hardening middleware."""
 
-
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 

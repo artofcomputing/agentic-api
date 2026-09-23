@@ -14,13 +14,13 @@ from pydantic_ai.models import Model
 from agentic.ai.agents.conversational.agent import (
     agent as conversational_agent,
 )
+from agentic.ai.agents.conversational.schema import AgentRunRequest, AgentRunResponse
 from agentic.ai.tools import time_toolset
 from agentic.api.deps import (
     agent_capacity,
     get_agent_settings,
     get_conversational_agent_model,
 )
-from agentic.ai.agents.conversational.schema import AgentRunRequest, AgentRunResponse
 from agentic.config.agent import AgentSettings
 
 logger = logging.getLogger(__name__)

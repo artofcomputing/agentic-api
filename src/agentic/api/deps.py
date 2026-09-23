@@ -1,9 +1,9 @@
 import asyncio
-import logging
 from collections.abc import AsyncIterator
+import logging
 
-import httpx
 from fastapi import HTTPException, Request, status
+import httpx
 from pydantic_ai.models import Model
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers import Provider

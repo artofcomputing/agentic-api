@@ -1,7 +1,7 @@
+from datetime import UTC, datetime
 import json
 import logging
 import typing
-from datetime import UTC, datetime
 from typing import Any
 
 _VALID_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}

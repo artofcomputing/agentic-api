@@ -1,10 +1,10 @@
 """Shared fixtures."""
 
-import pytest
 from httpx import ASGITransport, AsyncClient
 from pydantic import SecretStr
 from pydantic_ai import models
 from pydantic_ai.models.test import TestModel
+import pytest
 
 from agentic.api.app import create_app
 from agentic.config.agent import AgentSettings
